@@ -36,80 +36,84 @@ public class MegaEditText extends EditText {
 
     public MegaEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
+        init(attrs);
     }
 
     public MegaEditText(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        init(attrs);
     }
 
     @TargetApi(21)
     public MegaEditText(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+        init(attrs);
     }
 
+
+    private String extraInfo;
     private void init(AttributeSet attrs){
         TypedArray array = getContext().obtainStyledAttributes(
                 attrs, R.styleable.MegaEditText
         );
+        extraInfo = array.getString(R.styleable.MegaEditText_extraInformation);
         array.recycle();
     }
 
+    public String getExtraInfo() {
+        return extraInfo;
+    }
+
     /**
-     * Registre o callback para receber o evento
+     * Register callback to receive event.
      */
     public void setListener(BackPressed callback){
         mCallback = callback;
     }
 
     /**
-     * Subscreva o evento <code>dispatchKeyEventPreIme</code>.
-     * Intercepte o tipo de evento <code>KeyEvent.KEYCODE_BACK</code>
-     * e faça o que quiser com ele.
+     * Intercepts event <code>KeyEvent.KEYCODE_BACK</code>,
+     * continues with standard behavior, depending on
+     * {@link BackPressed#editTextOnBackPressed()} result
      */
     @Override
     public boolean dispatchKeyEventPreIme(KeyEvent event) {
         Log.d(TAG, "dispatchKeyEventPreIme(" + event + ")");
         if ( mCallback != null ) {
-            // O View verifica o tipo de evento
-            // dá a oportunidade do objeto inscrito
-            // processar o evento e anula a ação padrão
-            // em caso de retorno positivo
             if ( event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
                 KeyEvent.DispatcherState state = getKeyDispatcherState();
                 if (state != null) {
                     if (event.getAction() == KeyEvent.ACTION_DOWN
                             && event.getRepeatCount() == 0) {
                         state.startTracking(event, this);
-                        Log.i(TAG, "KeyEvent.ACTION_DOWN");
+                        Log.d(TAG, "KeyEvent.ACTION_DOWN");
                         return true;
                     } else if (event.getAction() == KeyEvent.ACTION_UP
                             && !event.isCanceled() && state.isTracking(event)) {
                         if ( mCallback.editTextOnBackPressed() ) {
-                            Log.i(TAG, "KeyEvent.ACTION_UP | cancelando processo padrão");
+                            Log.d(TAG, "KeyEvent.ACTION_UP | cancelling standard behavior");
                             return true;
                         } else {
-                            Log.i(TAG, "KeyEvent.ACTION_UP | processando o processo padrão");
+                            Log.d(TAG, "KeyEvent.ACTION_UP | proceeding with standard behavior");
                             return super.dispatchKeyEventPreIme(event);
                         }
                     }
                 }
             }
         }
-        Log.i(TAG, "Returning generic onBackPressed");
+        Log.i(TAG, "Returning generic event");
         return super.dispatchKeyEventPreIme(event);
     }
 
 
     public interface BackPressed {
         /**
-         * Listener para eventos onBackPressed com o teclado presente.
-         * O objeto inscrito tem a oportunidade de processar o evento
-         * e definir se o <code>View</code> deve seguir ou não com sua
-         * ação padrao.
-         * @return  true: <code>View</code> abandona a ação padrão e executa
-         *                  somente o bloco definido antes do retorno
-         *          false: <code>View</code> executa o código definido antes do
-         *                  retorno e dá sequência a ação convencional
+         * Listener for onBackPressed events with this object in focus.
+         *
+         * @return  true: <code>View</code> drop standard behavior e process
+         *                  only what is inside <code>editTextOnPressed</code> block
+         *          false: <code>View</code> executes code inside <code>editTextOnPressed</code>
+         *                  and proceed with standard behavior
          */
         boolean editTextOnBackPressed();
     }
