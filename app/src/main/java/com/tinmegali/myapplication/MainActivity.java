@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
              * Process actions before standard <code>onBackPressed</code>
              * behavior and gives the option to drop this standard beavior.
              * @return true: Drops <code>onBackPressed</code> standard behavior
-             *          false: Execute <code>onBackPressed</code> standard behavior.
+             *          false:  Execute <code>onBackPressed</code> standard behavior.
              */
             @Override
             public boolean editTextOnBackPressed() {

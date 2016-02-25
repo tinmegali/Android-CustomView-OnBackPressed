@@ -21,7 +21,7 @@ import com.tinmegali.myapplication.R;
  * Based on <a href="http://stackoverflow.com/a/5811630/4871489">@mhradek stackoverflow answer</a>
  *
  *
- * This custom EditText intercepts the editTextOnBackPressed when the softKeyboard
+ * This custom EditText intercepts the  editTextOnBackPressed when the softKeyboard
  * is visible on the screen and inform the event to subscriber.
  */
 public class MegaEditText extends EditText {
